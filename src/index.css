@@ -4,8 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --page-bg: #fdf2f8; /* pink-50 equivalent */
+  --header-bg: #5C1527;
+  --card-accent: #ec4899; /* pink-500 equivalent */
+}
+
 body {
   font-family: 'Poppins', sans-serif;
-  @apply bg-pink-50 text-gray-800;
-  background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='-20' y='90' font-family='Poppins, sans-serif' font-size='22' font-weight='700' fill='%235C1527' fill-opacity='0.03' transform='rotate(-30, 90, 90)'%3EN-CHÉRIE%3C/text%3E%3C/svg%3E");
+  background-color: var(--page-bg);
+  color: #1f2937; /* gray-800 */
+  /* Updated Watermark to explicitly say N-CHÉRIE clearly, denser pattern */
+  background-image: url("data:image/svg+xml,%3Csvg width='140' height='140' viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='80' font-family='Poppins, sans-serif' font-size='18' font-weight='800' fill='%235C1527' fill-opacity='0.07' transform='rotate(-35, 70, 70)'%3EN-CHÉRIE%3C/text%3E%3C/svg%3E");
+  background-attachment: fixed;
+  background-repeat: repeat;
 }

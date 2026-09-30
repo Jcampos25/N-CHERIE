@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Edit, Trash2, Plus, Image as ImageIcon } from 'lucide-react';
 
 export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAdd, countInCart = 0 }) {
+  const [imgError, setImgError] = useState(false);
+
   return (
-    <div className="bg-white rounded-2xl shadow-md border-2 border-pink-400 overflow-hidden relative group transition-transform hover:-translate-y-1 hover:shadow-xl">
+    <div className="bg-white rounded-2xl shadow-md border-2 overflow-hidden relative group transition-transform hover:-translate-y-1 hover:shadow-xl" style={{ borderColor: 'var(--card-accent, #ec4899)' }}>
       {isAdmin && (
         <div className="absolute top-2 right-2 flex gap-2 z-10 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button 
@@ -22,16 +24,17 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAdd,
       )}
       
       <div className="relative h-32 md:h-48 bg-pink-50 overflow-hidden">
-        {product.imagen ? (
+        {product.imagen && !imgError ? (
           <img 
             src={product.imagen} 
             alt={product.nombre} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={() => setImgError(true)} 
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-pink-300">
             <ImageIcon size={32} className="mb-2 opacity-50 md:w-12 md:h-12" />
-            <span className="text-[10px] md:text-sm font-medium">Sube foto</span>
+            <span className="text-[10px] md:text-sm font-medium">No disponible</span>
           </div>
         )}
         

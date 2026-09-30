@@ -16,6 +16,8 @@ const initialProducts = [
   { "id": "7", "nombre": "Primer San", "descripcion": "Prepara e hidrata tu piel antes del maquillaje.", "precio": 65, "existencias": 8, "imagen": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80" }
 ];
 
+import Footer from './components/Footer';
+
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -59,6 +61,22 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const updateColors = () => {
+      const pageBg = localStorage.getItem('ncherie_page_bg') || '#fdf2f8';
+      const headerBg = localStorage.getItem('ncherie_header_bg') || '#5C1527';
+      const cardAccent = localStorage.getItem('ncherie_card_accent') || '#ec4899';
+      
+      document.documentElement.style.setProperty('--page-bg', pageBg);
+      document.documentElement.style.setProperty('--header-bg', headerBg);
+      document.documentElement.style.setProperty('--card-accent', cardAccent);
+    };
+
+    updateColors();
+    window.addEventListener('settingsUpdated', updateColors);
+    return () => window.removeEventListener('settingsUpdated', updateColors);
+  }, []);
+
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
@@ -77,14 +95,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow pb-24 md:pb-8">
         <Routes>
           <Route path="/" element={<ClientView products={products} cart={cart} addToCart={addToCart} removeOneFromCart={removeOneFromCart} removeAllFromCart={removeAllFromCart} waNumber={waNumber} />} />
           <Route path="/admin" element={<AdminView products={products} waNumber={waNumber} setWaNumber={setWaNumber} />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit, Upload, X, MoveHorizontal, Maximize2 } from 'lucide-react';
+import { Edit, Upload, X, MoveHorizontal, Maximize2, Phone, Instagram, Music2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 export default function Header() {
@@ -9,6 +9,13 @@ export default function Header() {
   const [imgError, setImgError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
+  // Settings from LocalStorage
+  const [socials, setSocials] = useState({
+    whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
+    instagram: localStorage.getItem('ncherie_instagram') || '',
+    tiktok: localStorage.getItem('ncherie_tiktok') || ''
+  });
+
   const location = useLocation();
   const isAdminView = location.pathname === '/admin' && sessionStorage.getItem('ncherie_admin') === 'true';
 
@@ -18,6 +25,19 @@ export default function Header() {
     localStorage.setItem('ncherie_logospacing', logoSpacing);
     setImgError(false);
   }, [logo, logoSize, logoSpacing]);
+
+  useEffect(() => {
+    // Listen for custom event to update in real-time when edited in AdminView
+    const handleStorageChange = () => {
+      setSocials({
+        whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
+        instagram: localStorage.getItem('ncherie_instagram') || '',
+        tiktok: localStorage.getItem('ncherie_tiktok') || ''
+      });
+    };
+    window.addEventListener('settingsUpdated', handleStorageChange);
+    return () => window.removeEventListener('settingsUpdated', handleStorageChange);
+  }, []);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -32,9 +52,28 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#5C1527] shadow-[0_8px_30px_rgb(0,0,0,0.12)] sticky top-0 z-40 group rounded-b-[2rem] md:rounded-b-[3rem] border-b-2 border-pink-900/30">
-        <div className="container mx-auto px-4 h-20 md:h-24 flex items-center justify-center relative">
+      <header className="shadow-[0_8px_30px_rgb(0,0,0,0.12)] sticky top-0 z-40 group rounded-b-[2rem] md:rounded-b-[3rem] border-b-2 border-pink-900/30 transition-all duration-300" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)' }}>
+        <div className="container mx-auto px-4 h-20 md:h-24 flex items-center justify-between relative">
           
+          {/* Redes Sociales - Lado Izquierdo (Ocultas en Móvil) */}
+          <div className="hidden md:flex gap-3 z-10">
+            {socials.whatsapp && (
+              <a href={`https://wa.me/${socials.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+                <Phone size={20} />
+              </a>
+            )}
+            {socials.instagram && (
+              <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+                <Instagram size={20} />
+              </a>
+            )}
+            {socials.tiktok && (
+              <a href={socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+                <Music2 size={20} />
+              </a>
+            )}
+          </div>
+
           {/* Botón de edición visible solo en modo Admin */}
           {isAdminView && (
             <button 
@@ -47,7 +86,7 @@ export default function Header() {
           )}
 
           {/* Contenedor central con Logo y Texto */}
-          <div className="flex items-center justify-center" style={{ gap: `${logoSpacing}px` }}>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center" style={{ gap: `${logoSpacing}px` }}>
             {/* Renderizado del logo si existe y no da error */}
             {!imgError && logo && (
               <img 
@@ -63,10 +102,13 @@ export default function Header() {
             )}
             
             {/* El texto dorado SIEMPRE visible como solicitaste */}
-            <div className="text-white font-bold text-2xl md:text-3xl tracking-widest flex items-center drop-shadow-md">
+            <div className="text-white font-bold text-2xl md:text-3xl tracking-widest flex items-center drop-shadow-md whitespace-nowrap">
               <span className="text-[#D4AF37]">N-CHÉRIE</span>
             </div>
           </div>
+          
+          {/* Espaciador derecho para balancear el flex justify-between si es necesario */}
+          <div className="w-20 hidden md:block"></div>
         </div>
       </header>
 
