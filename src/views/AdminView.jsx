@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import AdminModal from '../components/AdminModal';
 import { Plus, Settings, X } from 'lucide-react';
+import { doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
-export default function AdminView({ products, setProducts, waNumber, setWaNumber }) {
+export default function AdminView({ products, waNumber, setWaNumber }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,9 +28,9 @@ export default function AdminView({ products, setProducts, waNumber, setWaNumber
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('¿Seguro que deseas eliminar este producto?')) {
-      setProducts(products.filter(p => p.id !== id));
+      await deleteDoc(doc(db, 'products', id.toString()));
     }
   };
 
@@ -42,16 +44,10 @@ export default function AdminView({ products, setProducts, waNumber, setWaNumber
     setIsModalOpen(true);
   };
 
-  const handleSave = (savedProduct) => {
-    if (editingProduct) {
-      setProducts(products.map(p => p.id === savedProduct.id ? savedProduct : p));
-    } else {
-      const newProduct = {
-        ...savedProduct,
-        id: Date.now()
-      };
-      setProducts([...products, newProduct]);
-    }
+  const handleSave = async (savedProduct) => {
+    const productId = editingProduct ? savedProduct.id.toString() : Date.now().toString();
+    const productData = { ...savedProduct, id: productId };
+    await setDoc(doc(db, 'products', productId), productData);
     setIsModalOpen(false);
   };
 
@@ -139,7 +135,10 @@ export default function AdminView({ products, setProducts, waNumber, setWaNumber
                 placeholder="Ej: 50588889999"
               />
               <button 
-                onClick={() => setIsSettingsOpen(false)}
+                onClick={async () => {
+                  await setDoc(doc(db, 'settings', 'config'), { waNumber }, { merge: true });
+                  setIsSettingsOpen(false);
+                }}
                 className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg transition-colors"
               >
                 Guardar
