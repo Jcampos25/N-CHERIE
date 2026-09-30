@@ -1,0 +1,17 @@
+[
+  { "id": 1, "nombre": "Set 4 Sponges Blenders", "descripcion": "Esponjas de maquillaje para un acabado perfecto.", "precio": 60, "imagen": "" },
+  { "id": 2, "nombre": "Uñas Instant", "descripcion": "Set de uñas postizas de aplicación rápida.", "precio": 70, "imagen": "" },
+  { "id": 3, "nombre": "Removedor de Maquillaje", "descripcion": "Limpieza profunda y suave para el rostro.", "precio": 50, "imagen": "" },
+  { "id": 4, "nombre": "Blush Contorno IC", "descripcion": "Ideal para definir y dar color al rostro.", "precio": 60, "imagen": "" },
+  { "id": 5, "nombre": "Lipgloss Doble Ushas", "descripcion": "Brillo labial de larga duración.", "precio": 50, "imagen": "" },
+  { "id": 6, "nombre": "Lipliner Pencil Saphila", "descripcion": "Lápiz delineador de labios preciso.", "precio": 20, "imagen": "" },
+  { "id": 7, "nombre": "Primer San", "descripcion": "Prepara tu piel antes del maquillaje.", "precio": 65, "imagen": "" },
+  { "id": 8, "nombre": "Concealer en Forma de...", "descripcion": "Corrector de alta cobertura.", "precio": 20, "imagen": "" },
+  { "id": 9, "nombre": "Paleta 2 Blush Ushas", "descripcion": "Dos tonos de rubor altamente pigmentados.", "precio": 35, "imagen": "" },
+  { "id": 10, "nombre": "Crema Manos Fresa", "descripcion": "Hidratación profunda con aroma a fresa.", "precio": 50, "imagen": "" },
+  { "id": 11, "nombre": "Delineador Natural Ushas", "descripcion": "Delineado de ojos resistente y preciso.", "precio": 25, "imagen": "" },
+  { "id": 12, "nombre": "Eyeliner Pencil Saphila", "descripcion": "Lápiz delineador de ojos negro intenso.", "precio": 20, "imagen": "" },
+  { "id": 13, "nombre": "Sellador en Spray Fresh", "descripcion": "Fija tu maquillaje todo el día.", "precio": 110, "imagen": "" },
+  { "id": 14, "nombre": "Polvo para Cejas Perfect", "descripcion": "Define y rellena tus cejas de forma natural.", "precio": 55, "imagen": "" },
+  { "id": 15, "nombre": "Blush/Labial en 1 Ushas", "descripcion": "Producto dual para mejillas y labios.", "precio": 45, "imagen": "" }
+]
