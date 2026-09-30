@@ -37,6 +37,9 @@ export default function ClientView({ products, cart, addToCart, removeOneFromCar
               countInCart={countInCart}
             />
           );
+        })}
+      </div>
+
       {/* Footer / Próximamente */}
       <div className="mt-20 mb-12 flex flex-col items-center justify-center text-center opacity-80">
         <div className="w-12 h-px bg-pink-300 mb-4"></div>
