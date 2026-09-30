@@ -25,7 +25,7 @@ export default function ClientView({ products, cart, addToCart, removeOneFromCar
       </div>
 
       {/* Grid: 2 columnas en móvil para estilo TikTok */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 mb-6">
         {products.map((product) => {
           const countInCart = cart.filter(item => item.id === product.id).length;
           return (
@@ -41,7 +41,7 @@ export default function ClientView({ products, cart, addToCart, removeOneFromCar
       </div>
 
       {/* Footer / Próximamente */}
-      <div className="mt-20 mb-12 flex flex-col items-center justify-center text-center opacity-80">
+      <div className="mt-8 mb-4 flex flex-col items-center justify-center text-center opacity-80">
         <div className="w-12 h-px bg-pink-300 mb-4"></div>
         <h3 className="text-[#5C1527] font-semibold tracking-[0.2em] text-xs md:text-sm uppercase mb-2">
           Próximamente
