@@ -30,7 +30,11 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Seguro que deseas eliminar este producto?')) {
-      await deleteDoc(doc(db, 'products', id.toString()));
+      try {
+        await deleteDoc(doc(db, 'products', id.toString()));
+      } catch (error) {
+        alert("Error al eliminar: Verifica las reglas de Firestore.");
+      }
     }
   };
 
@@ -45,10 +49,14 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
   };
 
   const handleSave = async (savedProduct) => {
-    const productId = editingProduct ? savedProduct.id.toString() : Date.now().toString();
-    const productData = { ...savedProduct, id: productId };
-    await setDoc(doc(db, 'products', productId), productData);
-    setIsModalOpen(false);
+    try {
+      const productId = editingProduct ? savedProduct.id.toString() : Date.now().toString();
+      const productData = { ...savedProduct, id: productId };
+      await setDoc(doc(db, 'products', productId), productData);
+      setIsModalOpen(false);
+    } catch (error) {
+      alert("Error al guardar: Verifica las reglas de Firestore.");
+    }
   };
 
   if (!isAuthenticated) {
@@ -136,8 +144,12 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
               />
               <button 
                 onClick={async () => {
-                  await setDoc(doc(db, 'settings', 'config'), { waNumber }, { merge: true });
-                  setIsSettingsOpen(false);
+                  try {
+                    await setDoc(doc(db, 'settings', 'config'), { waNumber }, { merge: true });
+                    setIsSettingsOpen(false);
+                  } catch (error) {
+                    alert("Error al guardar: Verifica las reglas de Firestore.");
+                  }
                 }}
                 className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg transition-colors"
               >

@@ -26,12 +26,20 @@ function App() {
       if (snapshot.empty) {
         // Seed initial data if DB is empty
         initialProducts.forEach(async (p) => {
-          await setDoc(doc(db, 'products', p.id), p);
+          try {
+            await setDoc(doc(db, 'products', p.id), p);
+          } catch (error) {
+            console.error("Error saving product:", error);
+            alert("Error al acceder a la base de datos. Verifica las Reglas de Seguridad de Firestore.");
+          }
         });
       } else {
         const prods = snapshot.docs.map(doc => doc.data());
         setProducts(prods);
       }
+    }, (error) => {
+      console.error("Firestore error:", error);
+      alert("No se pudieron cargar los productos. Asegúrate de haber configurado Firestore en 'Modo de Prueba'.");
     });
 
     const unsubSettings = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
@@ -39,8 +47,10 @@ function App() {
         setWaNumber(docSnap.data().waNumber);
       } else {
         // Set default waNumber in DB
-        setDoc(doc(db, 'settings', 'config'), { waNumber: '50500000000' });
+        setDoc(doc(db, 'settings', 'config'), { waNumber: '50500000000' }).catch(e => console.error(e));
       }
+    }, (error) => {
+      console.error("Firestore settings error:", error);
     });
 
     return () => {
