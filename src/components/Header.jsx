@@ -3,7 +3,7 @@ import { Edit, Upload, X, MoveHorizontal, Maximize2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 export default function Header() {
-  const [logo, setLogo] = useState(localStorage.getItem('ncherie_logo') || '/logo.jpg');
+  const [logo, setLogo] = useState(localStorage.getItem('ncherie_logo') || '/logo.png');
   const [logoSize, setLogoSize] = useState(localStorage.getItem('ncherie_logosize') || '64');
   const [logoSpacing, setLogoSpacing] = useState(localStorage.getItem('ncherie_logospacing') || '16');
   const [imgError, setImgError] = useState(false);
