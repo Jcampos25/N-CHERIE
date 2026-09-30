@@ -23,7 +23,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="mt-auto py-10 rounded-t-[2rem] md:rounded-t-[3rem] transition-all duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] border-t-2 border-pink-900/20" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)' }}>
+    <footer className="mt-auto pt-6 pb-8 rounded-t-[2rem] md:rounded-t-[3rem] transition-all duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] border-t-2 border-pink-900/20" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)' }}>
       <div className="container mx-auto px-4 flex flex-col items-center">
         
         {/* Logo and Name */}

@@ -97,7 +97,7 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 py-8 flex-grow">
+      <main className="container mx-auto px-4 pt-6 pb-0 flex-grow">
         <Routes>
           <Route path="/" element={<ClientView products={products} cart={cart} addToCart={addToCart} removeOneFromCart={removeOneFromCart} removeAllFromCart={removeAllFromCart} waNumber={waNumber} />} />
           <Route path="/admin" element={<AdminView products={products} waNumber={waNumber} setWaNumber={setWaNumber} />} />
