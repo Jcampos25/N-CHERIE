@@ -1,29 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Phone, Instagram, Music2 } from 'lucide-react';
 
-export default function Footer() {
-  const [logo, setLogo] = useState(localStorage.getItem('ncherie_logo') || '/logo.png');
-  const [socials, setSocials] = useState({
-    whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
-    instagram: localStorage.getItem('ncherie_instagram') || '',
-    tiktok: localStorage.getItem('ncherie_tiktok') || ''
-  });
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setSocials({
-        whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
-        instagram: localStorage.getItem('ncherie_instagram') || '',
-        tiktok: localStorage.getItem('ncherie_tiktok') || ''
-      });
-      setLogo(localStorage.getItem('ncherie_logo') || '/logo.png');
-    };
-    window.addEventListener('settingsUpdated', handleStorageChange);
-    return () => window.removeEventListener('settingsUpdated', handleStorageChange);
-  }, []);
+export default function Footer({ settings }) {
+  const logo = settings?.logo || '/logo.png';
+  const waNumber = settings?.waNumber || '';
+  const instagram = settings?.instagram || '';
+  const tiktok = settings?.tiktok || '';
 
   return (
-    <footer className="mt-auto pt-6 pb-8 rounded-t-[2rem] md:rounded-t-[3rem] transition-all duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] border-t-2 border-pink-900/20" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)' }}>
+    <footer className="mt-auto pt-6 pb-8 rounded-t-[2rem] md:rounded-t-[3rem] transition-all duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] border-t-2 border-pink-900/20" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)` }}>
       <div className="container mx-auto px-4 flex flex-col items-center">
         
         {/* Logo and Name */}
@@ -36,18 +21,18 @@ export default function Footer() {
 
         {/* Social Links (Sólo móvil) */}
         <div className="flex md:hidden gap-4 mb-6">
-          {socials.whatsapp && (
-            <a href={`https://wa.me/${socials.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
+          {waNumber && (
+            <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
               <Phone size={24} />
             </a>
           )}
-          {socials.instagram && (
-            <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
+          {instagram && (
+            <a href={instagram} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
               <Instagram size={24} />
             </a>
           )}
-          {socials.tiktok && (
-            <a href={socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
+          {tiktok && (
+            <a href={tiktok} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full bg-white/5">
               <Music2 size={24} />
             </a>
           )}

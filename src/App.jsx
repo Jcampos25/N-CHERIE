@@ -104,7 +104,7 @@ function App() {
           <Route path="/admin" element={<AdminView products={products} globalSettings={settings} />} />
         </Routes>
       </main>
-      <Footer />
+      <Footer settings={settings} />
     </div>
   );
 }
