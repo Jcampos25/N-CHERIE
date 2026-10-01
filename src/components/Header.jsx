@@ -1,43 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Upload, X, MoveHorizontal, Maximize2, Phone, Instagram, Music2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
-export default function Header() {
-  const [logo, setLogo] = useState(localStorage.getItem('ncherie_logo') || '/logo.png');
-  const [logoSize, setLogoSize] = useState(localStorage.getItem('ncherie_logosize') || '64');
-  const [logoSpacing, setLogoSpacing] = useState(localStorage.getItem('ncherie_logospacing') || '16');
+export default function Header({ settings }) {
+  const [logo, setLogo] = useState('');
+  const [logoSize, setLogoSize] = useState('64');
+  const [logoSpacing, setLogoSpacing] = useState('16');
   const [imgError, setImgError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
-  // Settings from LocalStorage
-  const [socials, setSocials] = useState({
-    whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
-    instagram: localStorage.getItem('ncherie_instagram') || '',
-    tiktok: localStorage.getItem('ncherie_tiktok') || ''
-  });
-
   const location = useLocation();
-  const isAdminView = location.pathname === '/admin' && sessionStorage.getItem('ncherie_admin') === 'true';
+  const isAdminView = location.pathname === '/admin';
 
   useEffect(() => {
-    localStorage.setItem('ncherie_logo', logo);
-    localStorage.setItem('ncherie_logosize', logoSize);
-    localStorage.setItem('ncherie_logospacing', logoSpacing);
-    setImgError(false);
-  }, [logo, logoSize, logoSpacing]);
-
-  useEffect(() => {
-    // Listen for custom event to update in real-time when edited in AdminView
-    const handleStorageChange = () => {
-      setSocials({
-        whatsapp: localStorage.getItem('ncherie_whatsapp') || '',
-        instagram: localStorage.getItem('ncherie_instagram') || '',
-        tiktok: localStorage.getItem('ncherie_tiktok') || ''
-      });
-    };
-    window.addEventListener('settingsUpdated', handleStorageChange);
-    return () => window.removeEventListener('settingsUpdated', handleStorageChange);
-  }, []);
+    if (settings) {
+      setLogo(settings.logo || '/logo.png');
+      setLogoSize(settings.logoSize || '64');
+      setLogoSpacing(settings.logoSpacing || '16');
+      setImgError(false);
+    }
+  }, [settings]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -50,25 +34,39 @@ export default function Header() {
     }
   };
 
+  const handleSave = async () => {
+    try {
+      await setDoc(doc(db, 'settings', 'config'), {
+        logo,
+        logoSize,
+        logoSpacing
+      }, { merge: true });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving header settings", error);
+      alert("Error al guardar. Verifica que hayas iniciado sesión y los permisos de Firestore.");
+    }
+  };
+
   return (
     <>
-      <header className="shadow-[0_8px_30px_rgb(0,0,0,0.12)] sticky top-0 z-40 group rounded-b-[2rem] md:rounded-b-[3rem] border-b-2 border-pink-900/30 transition-all duration-300" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)' }}>
+      <header className="shadow-[0_8px_30px_rgb(0,0,0,0.12)] sticky top-0 z-40 group rounded-b-[2rem] md:rounded-b-[3rem] border-b-2 border-pink-900/30 transition-all duration-300" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%), var(--header-bg, #5C1527)` }}>
         <div className="container mx-auto px-4 h-20 md:h-24 flex items-center justify-between relative">
           
           {/* Redes Sociales - Lado Izquierdo (Ocultas en Móvil) */}
           <div className="hidden md:flex gap-3 z-10">
-            {socials.whatsapp && (
-              <a href={`https://wa.me/${socials.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+            {settings?.waNumber && (
+              <a href={`https://wa.me/${settings.waNumber}`} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
                 <Phone size={20} />
               </a>
             )}
-            {socials.instagram && (
-              <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+            {settings?.instagram && (
+              <a href={settings.instagram} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
                 <Instagram size={20} />
               </a>
             )}
-            {socials.tiktok && (
-              <a href={socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
+            {settings?.tiktok && (
+              <a href={settings.tiktok} target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
                 <Music2 size={20} />
               </a>
             )}
@@ -173,10 +171,10 @@ export default function Header() {
               </div>
               
               <button 
-                onClick={() => setIsEditing(false)}
+                onClick={handleSave}
                 className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 rounded-lg transition-colors"
               >
-                Cerrar y Guardar
+                Guardar Cambios
               </button>
             </div>
           </div>

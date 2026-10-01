@@ -21,7 +21,18 @@ import Footer from './components/Footer';
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-  const [waNumber, setWaNumber] = useState('50500000000');
+  
+  const [settings, setSettings] = useState({
+    waNumber: '50500000000',
+    instagram: '',
+    tiktok: '',
+    pageBg: '#fdf2f8',
+    headerBg: '#5C1527',
+    cardAccent: '#ec4899',
+    logo: '/logo.png',
+    logoSize: '64',
+    logoSpacing: '16'
+  });
 
   useEffect(() => {
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
@@ -32,7 +43,7 @@ function App() {
             await setDoc(doc(db, 'products', p.id), p);
           } catch (error) {
             console.error("Error saving product:", error);
-            alert("Error al acceder a la base de datos. Verifica las Reglas de Seguridad de Firestore.");
+            // alert("Error al acceder a la base de datos. Verifica las Reglas de Seguridad de Firestore.");
           }
         });
       } else {
@@ -41,15 +52,15 @@ function App() {
       }
     }, (error) => {
       console.error("Firestore error:", error);
-      alert("No se pudieron cargar los productos. Asegúrate de haber configurado Firestore en 'Modo de Prueba'.");
+      // alert("No se pudieron cargar los productos. Asegúrate de haber configurado Firestore en 'Modo de Prueba'.");
     });
 
     const unsubSettings = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
-      if (docSnap.exists() && docSnap.data().waNumber) {
-        setWaNumber(docSnap.data().waNumber);
+      if (docSnap.exists()) {
+        setSettings(prev => ({ ...prev, ...docSnap.data() }));
       } else {
-        // Set default waNumber in DB
-        setDoc(doc(db, 'settings', 'config'), { waNumber: '50500000000' }).catch(e => console.error(e));
+        // Set default config in DB
+        setDoc(doc(db, 'settings', 'config'), settings).catch(e => console.error(e));
       }
     }, (error) => {
       console.error("Firestore settings error:", error);
@@ -62,20 +73,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const updateColors = () => {
-      const pageBg = localStorage.getItem('ncherie_page_bg') || '#fdf2f8';
-      const headerBg = localStorage.getItem('ncherie_header_bg') || '#5C1527';
-      const cardAccent = localStorage.getItem('ncherie_card_accent') || '#ec4899';
-      
-      document.documentElement.style.setProperty('--page-bg', pageBg);
-      document.documentElement.style.setProperty('--header-bg', headerBg);
-      document.documentElement.style.setProperty('--card-accent', cardAccent);
-    };
-
-    updateColors();
-    window.addEventListener('settingsUpdated', updateColors);
-    return () => window.removeEventListener('settingsUpdated', updateColors);
-  }, []);
+    document.documentElement.style.setProperty('--page-bg', settings.pageBg);
+    document.documentElement.style.setProperty('--header-bg', settings.headerBg);
+    document.documentElement.style.setProperty('--card-accent', settings.cardAccent);
+  }, [settings.pageBg, settings.headerBg, settings.cardAccent]);
 
   const addToCart = (product) => {
     setCart([...cart, product]);
@@ -96,11 +97,11 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header settings={settings} />
       <main className="container mx-auto px-4 pt-6 pb-0 flex-grow">
         <Routes>
-          <Route path="/" element={<ClientView products={products} cart={cart} addToCart={addToCart} removeOneFromCart={removeOneFromCart} removeAllFromCart={removeAllFromCart} waNumber={waNumber} />} />
-          <Route path="/admin" element={<AdminView products={products} waNumber={waNumber} setWaNumber={setWaNumber} />} />
+          <Route path="/" element={<ClientView products={products} cart={cart} addToCart={addToCart} removeOneFromCart={removeOneFromCart} removeAllFromCart={removeAllFromCart} waNumber={settings.waNumber} />} />
+          <Route path="/admin" element={<AdminView products={products} globalSettings={settings} />} />
         </Routes>
       </main>
       <Footer />

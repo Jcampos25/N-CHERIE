@@ -1,31 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import AdminModal from '../components/AdminModal';
-import { Plus, Settings, X } from 'lucide-react';
+import { Plus, Settings, X, LogOut } from 'lucide-react';
 import { doc, deleteDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { db, auth } from '../firebase';
 
-export default function AdminView({ products, waNumber, setWaNumber }) {
+export default function AdminView({ products, globalSettings }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
+  const [settings, setSettings] = useState({
+    waNumber: '',
+    instagram: '',
+    tiktok: '',
+    pageBg: '#fdf2f8',
+    headerBg: '#5C1527',
+    cardAccent: '#ec4899',
+  });
+
   useEffect(() => {
-    if (sessionStorage.getItem('ncherie_admin') === 'true') {
-      setIsAuthenticated(true);
+    if (globalSettings) {
+      setSettings({
+        waNumber: globalSettings.waNumber || '',
+        instagram: globalSettings.instagram || '',
+        tiktok: globalSettings.tiktok || '',
+        pageBg: globalSettings.pageBg || '#fdf2f8',
+        headerBg: globalSettings.headerBg || '#5C1527',
+        cardAccent: globalSettings.cardAccent || '#ec4899',
+      });
     }
+  }, [globalSettings]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (password === 'admin123') {
-      sessionStorage.setItem('ncherie_admin', 'true');
-      setIsAuthenticated(true);
-    } else {
-      alert('Contraseña incorrecta');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      alert('Correo o contraseña incorrecta');
+      console.error(error);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
   };
 
   const handleDelete = async (id) => {
@@ -48,7 +81,7 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (savedProduct) => {
+  const handleSaveProduct = async (savedProduct) => {
     try {
       const productId = editingProduct ? savedProduct.id.toString() : Date.now().toString();
       const productData = { ...savedProduct, id: productId };
@@ -58,14 +91,6 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
       alert("Error al guardar: Verifica las reglas de Firestore.");
     }
   };
-
-  const [settings, setSettings] = useState({
-    instagram: localStorage.getItem('ncherie_instagram') || '',
-    tiktok: localStorage.getItem('ncherie_tiktok') || '',
-    pageBg: localStorage.getItem('ncherie_page_bg') || '#fdf2f8',
-    headerBg: localStorage.getItem('ncherie_header_bg') || '#5C1527',
-    cardAccent: localStorage.getItem('ncherie_card_accent') || '#ec4899',
-  });
 
   const handleSettingChange = (e) => {
     setSettings(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,11 +102,20 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
         <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl border-2 border-pink-200 max-w-sm w-full">
           <h2 className="text-2xl font-bold text-[#5C1527] mb-6 text-center">Acceso Admin</h2>
           <input 
+            type="email" 
+            placeholder="Correo electrónico" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:border-pink-500"
+            required
+          />
+          <input 
             type="password" 
             placeholder="Contraseña" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:border-pink-500"
+            required
           />
           <button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition-colors">
             Entrar
@@ -98,7 +132,7 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
           <h1 className="text-3xl font-bold text-[#5C1527]">Panel de Administración</h1>
           <p className="text-pink-500">Modo de edición activado</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 justify-center">
           <button 
             onClick={() => setIsSettingsOpen(true)}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-full flex items-center gap-2 shadow-sm transition-colors"
@@ -111,7 +145,14 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
             className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full flex items-center gap-2 shadow-md transition-colors"
           >
             <Plus size={20} />
-            <span>Nuevo Producto</span>
+            <span className="hidden sm:inline">Nuevo</span>
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full flex items-center gap-2 shadow-md transition-colors"
+          >
+            <LogOut size={20} />
+            <span className="hidden sm:inline">Salir</span>
           </button>
         </div>
       </div>
@@ -132,7 +173,7 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
         <AdminModal 
           product={editingProduct} 
           onClose={() => setIsModalOpen(false)} 
-          onSave={handleSave} 
+          onSave={handleSaveProduct} 
         />
       )}
 
@@ -150,8 +191,9 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp (con código de área)</label>
               <input 
                 type="text" 
-                value={waNumber}
-                onChange={(e) => setWaNumber(e.target.value)}
+                name="waNumber"
+                value={settings.waNumber}
+                onChange={handleSettingChange}
                 className="w-full p-2 border rounded-lg focus:outline-none focus:border-pink-500 mb-4"
                 placeholder="Ej: 50588889999"
               />
@@ -214,15 +256,14 @@ export default function AdminView({ products, waNumber, setWaNumber }) {
               <button 
                 onClick={async () => {
                   try {
-                    await setDoc(doc(db, 'settings', 'config'), { waNumber }, { merge: true });
-                    localStorage.setItem('ncherie_whatsapp', waNumber);
-                    localStorage.setItem('ncherie_instagram', settings.instagram);
-                    localStorage.setItem('ncherie_tiktok', settings.tiktok);
-                    localStorage.setItem('ncherie_page_bg', settings.pageBg);
-                    localStorage.setItem('ncherie_header_bg', settings.headerBg);
-                    localStorage.setItem('ncherie_card_accent', settings.cardAccent);
-                    
-                    window.dispatchEvent(new Event('settingsUpdated'));
+                    await setDoc(doc(db, 'settings', 'config'), { 
+                      waNumber: settings.waNumber,
+                      instagram: settings.instagram,
+                      tiktok: settings.tiktok,
+                      pageBg: settings.pageBg,
+                      headerBg: settings.headerBg,
+                      cardAccent: settings.cardAccent
+                    }, { merge: true });
                     setIsSettingsOpen(false);
                   } catch (error) {
                     alert("Error al guardar: Verifica las reglas de Firestore.");
